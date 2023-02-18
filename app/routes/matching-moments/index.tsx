@@ -183,6 +183,12 @@ const MatchingMoments = () => {
           if (newTime < 0) {
             setGameStatusMessage('Time is up!');
             setGamePaused(true);
+            setGamePaused(true);
+            setBoard(null);
+            setRemainingSquares(0);
+            setLevelRemainingTime(0);
+            setPairdSquares({});
+            setSelected(null);
             return 0;
           }
           return newTime;
