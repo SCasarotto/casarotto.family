@@ -1,4 +1,8 @@
-import type { LinksFunction, MetaFunction } from '@remix-run/node';
+import type {
+  LinksFunction,
+  MetaFunction,
+  SerializeFrom,
+} from '@remix-run/node';
 import {
   Links,
   LiveReload,
@@ -6,6 +10,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from '@remix-run/react';
 import { Analytics } from '@vercel/analytics/react';
 import datepicker from 'react-datepicker/dist/react-datepicker.css';
@@ -26,7 +31,22 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
 ];
 
+export const loader = () => ({
+  ENV: {
+    VERCEL_ANALYTICS_ID: process.env.VERCEL_ANALYTICS_ID,
+  },
+});
+
+// Attach the ENV to the window object so that Remix can access it
+declare global {
+  interface Window {
+    ENV: SerializeFrom<typeof loader>['ENV'];
+  }
+}
+
 export default function App() {
+  const { ENV } = useLoaderData<typeof loader>();
+
   return (
     <html lang='en'>
       <head>
@@ -35,10 +55,16 @@ export default function App() {
       </head>
       <body>
         <Outlet />
+        <Analytics />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
-        <Analytics />
+        {/* 👇 Write the ENV values to the window */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(ENV)}`,
+          }}
+        />
       </body>
     </html>
   );
