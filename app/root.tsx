@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
+import datepicker from 'react-datepicker/dist/react-datepicker.css';
 
 import styles from '~/tailwind.css';
 
@@ -16,7 +17,13 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 });
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }];
+import datepickerOverrides from './styles/react-datepicker-overrides.css';
+
+export const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: datepicker },
+  { rel: 'stylesheet', href: datepickerOverrides },
+  { rel: 'stylesheet', href: styles },
+];
 
 export default function App() {
   return (

@@ -18,7 +18,10 @@
     "@remix-run/react": "^1.11.1",
     "@remix-run/vercel": "^1.11.1",
     "@vercel/node": "^2.6.2",
+    "ariakit": "2.0.0-next.43",
+    "date-fns": "^2.29.3",
     "react": "^18.2.0",
+    "react-datepicker": "^4.10.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
@@ -27,6 +30,7 @@
     "@remix-run/eslint-config": "^1.11.1",
     "@remix-run/serve": "^1.11.1",
     "@types/react": "^18.0.25",
+    "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "^18.0.8",
     "eslint": "^8.33.0",
     "eslint-config-prettier": "^8.6.0",
