@@ -28,7 +28,7 @@ import { Tr } from '~/components/sralab/Tr';
 type PayPeriod = {
   start: Date;
   end: Date;
-  spend: number;
+  spend?: number;
   balance: number;
 };
 
@@ -38,6 +38,7 @@ type RecalculatePayPeriodData = {
   payPeriodCount: number;
   ptoGainPerPayPeriod: number;
   prevPayPeriodArray: Array<PayPeriod>;
+  initialize?: boolean;
 };
 const recalculatePayPeriod = (d: RecalculatePayPeriodData) => {
   const {
@@ -46,6 +47,7 @@ const recalculatePayPeriod = (d: RecalculatePayPeriodData) => {
     payPeriodCount,
     ptoGainPerPayPeriod,
     prevPayPeriodArray,
+    initialize,
   } = d;
 
   const initialPTO = startingPTO || 0;
@@ -58,17 +60,19 @@ const recalculatePayPeriod = (d: RecalculatePayPeriodData) => {
     const start = addWeeks(startDate, 2 * i);
     const end = subDays(addWeeks(start, 2), 1);
     // gotta be careful because the number of pay perios could be larger than the previous array
-    const spend = prevPayPeriodArray?.[i]?.spend || 0;
+    const spend = prevPayPeriodArray?.[i]?.spend;
+    const spendForCalc = spend || 0;
     // Use initialPTO if this is the first pay period
     // Otherwise use the previous pay period's balance
     const balance =
       (i === 0 ? initialPTO : newPayPeriodArray[i - 1].balance + ptoGain) -
-      spend;
+      spendForCalc;
 
     newPayPeriodArray.push({
       start,
       end,
-      spend,
+      // This will initialize the spend to 0 on mount
+      spend: initialize ? spend || 0 : spend,
       balance,
     });
   }
@@ -137,6 +141,7 @@ export default function PTOCalculator() {
       payPeriodCount: form.values.payPeriodCount,
       ptoGainPerPayPeriod,
       prevPayPeriodArray: [],
+      initialize: true,
     }),
   );
 
@@ -177,7 +182,7 @@ export default function PTOCalculator() {
               const spend = e.target.valueAsNumber;
               setPayPeriodArray((prev) => {
                 // Its okay to mutate because recalculatePayPeriod immutably modifies the array
-                prev[i].spend = spend;
+                prev[i].spend = isNaN(spend) ? undefined : spend;
                 return recalculatePayPeriod({
                   startDate: form.values.initialStartDate,
                   startingPTO: form.values.initialPTO,
@@ -187,7 +192,23 @@ export default function PTOCalculator() {
                 });
               });
             }}
-            value={d.spend || 0}
+            value={d.spend ?? ''}
+            // On blue if it is empty set to 0
+            onBlur={(e) => {
+              if (e.target.value === '') {
+                setPayPeriodArray((prev) => {
+                  // Its okay to mutate because recalculatePayPeriod immutably modifies the array
+                  prev[i].spend = 0;
+                  return recalculatePayPeriod({
+                    startDate: form.values.initialStartDate,
+                    startingPTO: form.values.initialPTO,
+                    payPeriodCount: form.values.payPeriodCount,
+                    ptoGainPerPayPeriod,
+                    prevPayPeriodArray: prev,
+                  });
+                });
+              }
+            }}
           />
         ),
       },
@@ -247,7 +268,16 @@ export default function PTOCalculator() {
           </InputWrapper>
           <InputWrapper>
             <Label name={form.names.initialPTO}>Initail PTO</Label>
-            <Input name={form.names.initialPTO} type='number' min={0} />
+            <Input
+              name={form.names.initialPTO}
+              type='number'
+              min={0}
+              onBlur={(e) => {
+                if (e.target.value === '') {
+                  form.setValue(form.names.initialPTO, 0);
+                }
+              }}
+            />
             <InputError name={form.names.initialPTO} />
           </InputWrapper>
           <InputWrapper>
@@ -259,6 +289,11 @@ export default function PTOCalculator() {
               type='number'
               min={1}
               max={100}
+              onBlur={(e) => {
+                if (e.target.value === '') {
+                  form.setValue(form.names.payPeriodCount, 26);
+                }
+              }}
             />
             <InputError name={form.names.payPeriodCount} />
           </InputWrapper>
@@ -311,6 +346,11 @@ export default function PTOCalculator() {
               type='number'
               min={0}
               step={1}
+              onBlur={(e) => {
+                if (e.target.value === '') {
+                  form.setValue(form.names.yearsOfService, 1);
+                }
+              }}
             />
             <InputError name={form.names.yearsOfService} />
           </InputWrapper>
