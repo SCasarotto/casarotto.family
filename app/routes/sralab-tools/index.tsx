@@ -33,6 +33,11 @@ export default function Index() {
         </a>
         .
       </p>
+      <p className='mt-4 text-sm italic leading-tight'>
+        <b>Disclaimer:</b> This code and tools are not associated with SRA Lab
+        or any of its employees. It is provided as is, with no warranty or
+        guarantee of any kind. Use at your own risk.
+      </p>
       <p className='mb-4 text-center leading-relaxed'>
         <Link to='/' className='mt-8 block underline'>
           Return Home
