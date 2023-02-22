@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react';
+import { Analytics } from '@vercel/analytics/react';
 import datepicker from 'react-datepicker/dist/react-datepicker.css';
 
 import styles from '~/tailwind.css';
@@ -37,6 +38,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <Analytics />
       </body>
     </html>
   );

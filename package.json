@@ -17,6 +17,7 @@
     "@remix-run/node": "^1.11.1",
     "@remix-run/react": "^1.11.1",
     "@remix-run/vercel": "^1.11.1",
+    "@vercel/analytics": "^0.1.10",
     "@vercel/node": "^2.6.2",
     "ariakit": "2.0.0-next.43",
     "date-fns": "^2.29.3",
