@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node';
 import { Link } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 
@@ -158,6 +159,11 @@ const isValidPair = (square1: GameSquare, square2: GameSquare) => {
   // Valid Pair!
   return true;
 };
+
+export const meta: MetaFunction = () => ({
+  title: 'Matching Moments',
+  description: 'A matching game with a twist',
+});
 
 const MatchingMoments = () => {
   const [board, setBoard] = useState<Maybe<Board>>(null);

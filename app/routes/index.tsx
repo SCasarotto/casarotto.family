@@ -1,4 +1,11 @@
+import type { MetaFunction } from '@remix-run/node';
 import { Link } from '@remix-run/react';
+
+export const meta: MetaFunction = () => ({
+  title: 'Casarotto Family | Home',
+  description:
+    'A site of misc things and side projects created by Stuart Casarotto.',
+});
 
 export default function Index() {
   return (

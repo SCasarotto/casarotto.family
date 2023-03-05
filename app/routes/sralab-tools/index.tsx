@@ -1,4 +1,11 @@
+import type { MetaFunction } from '@remix-run/node';
 import { Link } from '@remix-run/react';
+
+export const meta: MetaFunction = () => ({
+  title: 'SRA Lab Tools',
+  description:
+    'A collection of tools to help make SRA Lab employees day easier.',
+});
 
 export default function Index() {
   return (

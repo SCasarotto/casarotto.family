@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node';
 import { Form, useFormState, useSelectState } from 'ariakit';
 import { addHours, format, startOfDay } from 'date-fns';
 import type { ReactNode } from 'react';
@@ -125,6 +126,11 @@ const recalculateHours = (d: RecalculateHoursData) => {
   }
   return arr;
 };
+
+export const meta: MetaFunction = () => ({
+  title: 'SRA Lab Tools | ADP Calculator',
+  description: 'A tool to help calculate time sheets.',
+});
 
 type HourData = {
   department: string;

@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node';
 import { Form, useFormState, useSelectState } from 'ariakit';
 import {
   addWeeks,
@@ -100,6 +101,11 @@ const classifications = {
 };
 type Classification = keyof typeof classifications;
 const classificationOptions = Object.values(classifications);
+
+export const meta: MetaFunction = () => ({
+  title: 'SRA Lab Tools | PTO Calculator',
+  description: 'A tool to help calculate PTO for each pay period.',
+});
 
 export default function PTOCalculator() {
   const form = useFormState<{
