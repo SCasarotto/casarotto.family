@@ -118,7 +118,7 @@ const INITIAL_GRID_CONFIG: GridConfig = {
 };
 const MAX_OPTIONS = 12;
 const getNextGridConfig = (level: number) => {
-  const config = INITIAL_GRID_CONFIG;
+  const config = { ...INITIAL_GRID_CONFIG };
   // Level starts at 1
   for (let i = 1; i < level; i++) {
     // Increment lower between x and y but don't produce an odd number
@@ -208,6 +208,75 @@ const MatchingMoments = () => {
     };
   }, [gamePaused]);
 
+  const onSquareClick = (square: GameSquare) => {
+    const { x, y } = square;
+    // Select if nothing is selected yet
+    if (!selected) {
+      setSelected(square);
+      return;
+    }
+    // Do nothing if the same square is selected
+    if (selected.key === square.key) {
+      return;
+    }
+
+    // Select new square if invalid pair
+    if (!isValidPair(selected, square)) {
+      setSelected(square);
+      return;
+    }
+
+    // Valid Pair
+
+    // Remove Squares
+    setPairdSquares((prev) => ({
+      ...prev,
+      [getSquareKey(x, y)]: true,
+      [getSquareKey(selected.x, selected.y)]: true,
+    }));
+
+    // Reduce remaining square count
+    setRemainingSquares((prev) => prev - 2);
+
+    // Unselect
+    setSelected(null);
+
+    const isEndOfLevel = remainingSquares - 2 === 0;
+
+    // Give Points
+    setPoints((prev) => {
+      let newTotal = prev + getPointsPerPairForLevel(level);
+      if (isEndOfLevel) {
+        newTotal += (levelRemainingTime / 1000) * POINTS_PER_REMAINING_TIME;
+      }
+      return Math.round(newTotal);
+    });
+
+    // Check to see if game is over and we should go to next level
+    if (isEndOfLevel) {
+      // Check to see if we are at the last level
+      if (level === MAX_LEVEL) {
+        setGameStatusMessage('You Win!');
+        setGamePaused(true);
+        setBoard(null);
+        setRemainingSquares(0);
+        setLevelRemainingTime(0);
+        setPairdSquares({});
+        setSelected(null);
+        return;
+      }
+
+      const newLevel = level + 1;
+      setLevel(newLevel);
+      const config = getNextGridConfig(newLevel);
+      setBoard(createBoard(config));
+      setRemainingSquares(config.x * config.y);
+      setLevelRemainingTime(getTimeForLevel(newLevel));
+      setPairdSquares({});
+      setSelected(null);
+    }
+  };
+
   return (
     <div className='flex min-h-screen w-screen justify-center bg-zinc-100 p-4'>
       <div className='w-[1200px]'>
@@ -230,6 +299,7 @@ const MatchingMoments = () => {
             <button
               type='button'
               onClick={() => {
+                console.log(INITIAL_GRID_CONFIG);
                 const config = INITIAL_GRID_CONFIG;
                 const board = createBoard(config);
                 setBoard(board);
@@ -284,89 +354,11 @@ const MatchingMoments = () => {
                   return (
                     <button
                       type='button'
-                      onClick={() => {
-                        // Select if nothing is selected yet
-                        if (!selected) {
-                          setSelected(square);
-                          return;
-                        }
-                        // Unselect the currently selected one
-                        if (selected.key === square.key) {
-                          setSelected(null);
-                          return;
-                        }
-
-                        // Check if they match
-                        if (isValidPair(selected, square)) {
-                          // Remove Squares
-                          setPairdSquares((prev) => ({
-                            ...prev,
-                            [getSquareKey(x, y)]: true,
-                            [getSquareKey(selected.x, selected.y)]: true,
-                          }));
-
-                          // Reduce remaining square count
-                          setRemainingSquares((prev) => prev - 2);
-
-                          // Unselect
-                          setSelected(null);
-
-                          const isEndOfLevel = remainingSquares - 2 === 0;
-
-                          // Give Points
-                          setPoints((prev) => {
-                            let newTotal =
-                              prev + getPointsPerPairForLevel(level);
-                            if (isEndOfLevel) {
-                              newTotal +=
-                                (levelRemainingTime / 1000) *
-                                POINTS_PER_REMAINING_TIME;
-                            }
-                            return Math.round(newTotal);
-                          });
-
-                          // Check to see if game is over and we should go to next level
-                          if (isEndOfLevel) {
-                            // Check to see if we are at the last level
-                            if (level === MAX_LEVEL) {
-                              setGameStatusMessage('You Win!');
-                              setGamePaused(true);
-                              setBoard(null);
-                              setRemainingSquares(0);
-                              setLevelRemainingTime(0);
-                              setPairdSquares({});
-                              setSelected(null);
-                              return;
-                            }
-
-                            const newLevel = level + 1;
-                            setLevel(newLevel);
-                            const config = getNextGridConfig(newLevel);
-                            setBoard(createBoard(config));
-                            setRemainingSquares(config.x * config.y);
-                            setLevelRemainingTime(getTimeForLevel(newLevel));
-                            setPairdSquares({});
-                            setSelected(null);
-                          }
-                          return;
-                        }
-
-                        // Handle invalid pairs
-
-                        // Remove selection
-                        setSelected(null);
-
-                        // Show invalid pair warning
-                        setGameStatusMessage('Invalid pair, try again');
-                        setTimeout(
-                          () => setGameStatusMessage(null),
-                          3000, // 3 seconds
-                        );
-                      }}
-                      className={`rounded-lg border-2  ${
+                      onClick={() => onSquareClick(square)}
+                      className={`rounded-lg border-2 transition hover:scale-110 ${
                         isSelected
                           ? 'border-black hover:border-black'
-                          : 'border-transparent hover:border-gray-500'
+                          : 'border-transparent hover:border-gray-300'
                       }`}
                       style={{
                         width: GAME_SQAURE_SIZE,
