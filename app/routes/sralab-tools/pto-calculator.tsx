@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { Button } from '~/components/sralab/Button';
 import { DatePicker } from '~/components/sralab/DatePicker';
 import { Input } from '~/components/sralab/Input';
 import { InputError } from '~/components/sralab/InputError';
@@ -102,6 +103,8 @@ const classifications = {
 type Classification = keyof typeof classifications;
 const classificationOptions = Object.values(classifications);
 
+const LOCAL_STORAGE_KEY = 'sralab-tools-pto-calculator';
+
 export const meta: MetaFunction = () => ({
   title: 'SRA Lab Tools | PTO Calculator',
   description: 'A tool to help calculate PTO for each pay period.',
@@ -123,6 +126,7 @@ export default function PTOCalculator() {
       yearsOfService: 1,
     },
   });
+  const { setValues } = form;
   const classificationSelectState = useSelectState<Classification>({
     value: form.values.classification,
     setValue: (value) =>
@@ -167,6 +171,34 @@ export default function PTOCalculator() {
     form.values.payPeriodCount,
     ptoGainPerPayPeriod,
   ]);
+
+  // Debounce sync with local storage
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({ formValues: form.values, payPeriodArray }),
+      );
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [form.values, payPeriodArray]);
+
+  // On first load, load from local storage
+  useEffect(() => {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (data) {
+      const { formValues, payPeriodArray } = JSON.parse(data);
+      setValues(formValues);
+      setPayPeriodArray(
+        payPeriodArray.map((d: PayPeriod) => ({
+          ...d,
+          // Have to convert back to date
+          start: new Date(d.start),
+          end: new Date(d.end),
+        })),
+      );
+    }
+  }, [setValues]);
 
   const tableConfig: Array<{
     header: string;
@@ -359,6 +391,28 @@ export default function PTOCalculator() {
               }}
             />
             <InputError name={form.names.yearsOfService} />
+          </InputWrapper>
+          <InputWrapper className='w-auto flex-none self-end'>
+            <Button
+              type='button'
+              className='inline h-[45px] w-auto'
+              variant='secondary'
+              onClick={() => {
+                form.reset();
+                setPayPeriodArray(
+                  recalculatePayPeriod({
+                    startDate: form.values.initialStartDate,
+                    startingPTO: form.values.initialPTO,
+                    payPeriodCount: form.values.payPeriodCount,
+                    ptoGainPerPayPeriod,
+                    prevPayPeriodArray: [],
+                    initialize: true,
+                  }),
+                );
+              }}
+            >
+              Clear
+            </Button>
           </InputWrapper>
         </InputRow>
       </Form>
