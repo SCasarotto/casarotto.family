@@ -299,7 +299,6 @@ const MatchingMoments = () => {
             <button
               type='button'
               onClick={() => {
-                console.log(INITIAL_GRID_CONFIG);
                 const config = INITIAL_GRID_CONFIG;
                 const board = createBoard(config);
                 setBoard(board);
