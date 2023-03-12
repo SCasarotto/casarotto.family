@@ -40,9 +40,9 @@ export default function Index() {
         <img
           src={logo}
           alt='Casarotto Family Logo'
-          className='inline-block w-24'
+          className='mb-4 inline-block w-24'
         />
-        <h1 className='mb-6 text-4xl'>Home</h1>
+        <h1 className='mb-4 text-4xl'>Home</h1>
         <p className='mb-2 text-left'>
           This site is a repository of Casarotto family misc things and side
           projects created by Stuart Casarotto. You can find the code for this
