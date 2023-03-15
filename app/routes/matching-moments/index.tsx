@@ -6,6 +6,17 @@ import { getRandomIndex } from '~/utils/getRandomIndex';
 import { getUniqueColor } from '~/utils/getUniqueColor';
 import type { Maybe } from '~/utils/typescript';
 
+// TODO:
+// - Add disappear annimation
+// - Add pause button
+// - Add better lose screen
+// - Add better win screen
+// - Add better start screen
+// - Add screen between levels
+// - Update size of board to include an outer rim of squares
+// - Add path mode
+// - Add personal images
+
 type GameSquare = {
   x: number;
   y: number;
